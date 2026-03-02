@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Application routes
-app.use("/api/v1/products", ProductRoutes);
+app.use("/api/products", ProductRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");

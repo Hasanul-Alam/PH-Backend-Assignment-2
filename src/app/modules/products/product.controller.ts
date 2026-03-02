@@ -42,10 +42,32 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
 
 const getAllProducts = async (req: Request, res: Response): Promise<void> => {
   try {
+    const allProducts = await ProductServices.getAllProductsFromDB();
     res.status(200).json({
       success: true,
       message: "Products fetched successfully",
+      data: allProducts,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
       data: null,
+    });
+  }
+};
+
+const getSingleProduct = async (req: Request, res: Response) => {
+  try {
+    const { productId } = req.params;
+    console.log(productId);
+    const product = await ProductServices.getSingleProductFromDB(
+      productId as string,
+    );
+    res.status(200).json({
+      success: true,
+      message: "Product fetched successfully",
+      data: product,
     });
   } catch (error: any) {
     res.status(500).json({
@@ -59,4 +81,5 @@ const getAllProducts = async (req: Request, res: Response): Promise<void> => {
 export const ProductControllers = {
   createProduct,
   getAllProducts,
+  getSingleProduct,
 };
