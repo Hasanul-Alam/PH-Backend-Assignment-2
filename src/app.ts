@@ -4,6 +4,7 @@ import express, {
   type Response,
 } from "express";
 import cors from "cors";
+import { ProductRoutes } from "./app/modules/products/product.routes.js";
 const app: Application = express();
 
 // parsers
@@ -11,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 // Application routes
-// app.use("/api/v1/students", StudentRoutes);
+app.use("/api/v1/products", ProductRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
