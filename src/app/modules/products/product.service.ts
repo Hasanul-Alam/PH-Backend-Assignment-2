@@ -16,8 +16,39 @@ const getSingleProductFromDB = async (id: string) => {
   return product;
 };
 
+const updateProductIntoDB = async (
+  id: string,
+  updatedData: Partial<IProduct>,
+) => {
+  const updatedProduct = await ProductModel.findByIdAndUpdate(id, updatedData, {
+    options: { returnDocument: "after" },
+  });
+  return updatedProduct;
+};
+
+const deleteProductFromDB = async (id: string) => {
+  const deletedProduct = await ProductModel.findByIdAndDelete(id);
+  return deletedProduct;
+};
+
+// Search products by name or category
+const escapeRegex = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const searchProductsInDB = async (query: string) => {
+  const safeQuery = escapeRegex(query);
+  const regex = new RegExp(safeQuery, "i");
+
+  return ProductModel.find({
+    $or: [{ name: regex }, { category: regex }],
+  });
+};
+
 export const ProductServices = {
   createProductIntoDB,
   getAllProductsFromDB,
   getSingleProductFromDB,
+  updateProductIntoDB,
+  deleteProductFromDB,
+  searchProductsInDB,
 };
