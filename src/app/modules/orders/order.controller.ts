@@ -33,6 +33,38 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+const getAllOrders = async (req: Request, res: Response): Promise<void> => {
+  // check if email query is present
+  const { email } = req.query;
+
+  //   if email query is present, fetch orders by email
+  if (email) {
+    const orders = await OrderServices.getOrderByEmailFromDB(email as string);
+    res.status(200).json({
+      success: true,
+      message: "Orders fetched successfully",
+      data: orders,
+    });
+    return;
+  }
+
+  // if no email query, fetch all orders
+  try {
+    const allOrders = await OrderServices.getAllOrdersFromDB();
+    res.status(200).json({
+      success: true,
+      message: "Orders fetched successfully",
+      data: allOrders,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || "Internal server error",
+      data: null,
+    });
+  }
+};
 export const OrderController = {
   createOrder,
+  getAllOrders,
 };
