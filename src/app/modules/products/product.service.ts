@@ -10,4 +10,6 @@ const createProductIntoDB = async (product: IProduct) => {
   }
 };
 
-export { createProductIntoDB };
+export const ProductServices = {
+  createProductIntoDB,
+};
