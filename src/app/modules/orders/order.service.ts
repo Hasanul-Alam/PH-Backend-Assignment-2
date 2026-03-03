@@ -3,14 +3,14 @@ import type { IOrder } from "./order.interface.js";
 import { OrderModel } from "./order.model.js";
 
 export const createOrderIntoDB = async (orderData: IOrder) => {
-  // 1️⃣ Fetch product
+  // Fetch product
   const product = await ProductModel.findById(orderData.productId);
 
   if (!product) {
     throw new Error("Product not found");
   }
 
-  // 2️⃣ Check availability
+  // Check availability
   if (
     !product.inventory.inStock ||
     product.inventory.quantity < orderData.quantity
@@ -20,19 +20,19 @@ export const createOrderIntoDB = async (orderData: IOrder) => {
     );
   }
 
-  // 3️⃣ Calculate total price (optional: use product.price instead of client price)
+  // Calculate total price (optional: use product.price instead of client price)
   const totalPrice = product.price * orderData.quantity;
 
-  // 4️⃣ Create order
+  // Create order
   const order = await OrderModel.create({
     ...orderData,
     price: totalPrice,
   });
 
-  // 5️⃣ Reduce product quantity
+  // Reduce product quantity
   product.inventory.quantity -= orderData.quantity;
 
-  // 6️⃣ Update availability if quantity is now 0
+  // Update availability if quantity is now 0
   if (product.inventory.quantity === 0) {
     product.inventory.inStock = false;
   }
