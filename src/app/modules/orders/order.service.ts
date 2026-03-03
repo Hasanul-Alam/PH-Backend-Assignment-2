@@ -1,9 +1,45 @@
+import ProductModel from "../products/product.model.js";
 import type { IOrder } from "./order.interface.js";
 import { OrderModel } from "./order.model.js";
 
-const createOrderIntoDB = async (order: IOrder) => {
-  const createdOrder = OrderModel.create(order);
-  return createdOrder;
+export const createOrderIntoDB = async (orderData: IOrder) => {
+  // 1️⃣ Fetch product
+  const product = await ProductModel.findById(orderData.productId);
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  // 2️⃣ Check availability
+  if (
+    !product.inventory.inStock ||
+    product.inventory.quantity < orderData.quantity
+  ) {
+    throw new Error(
+      `Product is not available or insufficient quantity. Available: ${product.inventory.quantity}`,
+    );
+  }
+
+  // 3️⃣ Calculate total price (optional: use product.price instead of client price)
+  const totalPrice = product.price * orderData.quantity;
+
+  // 4️⃣ Create order
+  const order = await OrderModel.create({
+    ...orderData,
+    price: totalPrice,
+  });
+
+  // 5️⃣ Reduce product quantity
+  product.inventory.quantity -= orderData.quantity;
+
+  // 6️⃣ Update availability if quantity is now 0
+  if (product.inventory.quantity === 0) {
+    product.inventory.inStock = false;
+  }
+
+  await product.save(); // persist changes
+
+  return order;
 };
 
 const getAllOrdersFromDB = async () => {

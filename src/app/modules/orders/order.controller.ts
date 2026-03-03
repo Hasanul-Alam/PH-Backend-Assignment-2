@@ -1,14 +1,19 @@
 import type { Request, Response } from "express";
 import { orderValidationSchema } from "./order.validation.js";
 import { OrderServices } from "./order.service.js";
+import { ProductServices } from "../products/product.service.js";
 
 const createOrder = async (req: Request, res: Response): Promise<void> => {
   try {
+    // destructure order data from request body
     const { order } = req.body;
+    // validate order data
     const { error: orderValidationError, value } =
       orderValidationSchema.validate(order, {
         abortEarly: false,
       });
+
+    // if validation error, return 400 with error details
     if (orderValidationError) {
       res.status(400).json({
         success: false,
@@ -18,7 +23,11 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
       });
       return;
     }
+
+    // create order in database
     const result = await OrderServices.createOrderIntoDB(value);
+
+    // return success response with created order data
     res.status(201).json({
       success: true,
       message: "Order created successfully",
